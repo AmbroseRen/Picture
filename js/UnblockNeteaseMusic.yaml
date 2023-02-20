@@ -1,0 +1,76 @@
+# URL:     https://raw.githubusercontent.com/DesperadoJ/Rules-for-UnblockNeteaseMusic/master/Clash/UnblockNeteaseMusic.yaml
+# Project: https://github.com/DesperadoJ/Rules-for-UnblockNeteaseMusic
+# Note:    This proxy is for free, please complain the seller if you were charged
+#          本代理完全免费，如遇收费请投诉举报卖家
+
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+dns:
+  enable: true
+  listen: 0.0.0.0:5353
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+    - 1.0.0.1
+    - 8.8.4.4
+  nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+    - 1.0.0.1
+    - 8.8.4.4
+  fallback:
+    - https://1.1.1.1/dns-query
+    - https://doh.dns.sb/dns-query
+    - https://public.dns.iij.jp/dns-query
+  fallback-filter:
+    geoip: true
+    domain:
+      - '+.desperadoj.com'
+
+proxy-providers:
+  NeteaseMusic:
+    type: http
+    path: ./Proxy/NeteaseMusic.yaml
+    url: https://cdn.staticaly.com/gh/DesperadoJ/Rules-for-UnblockNeteaseMusic/master/Clash/Proxy/NeteaseMusic.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
+proxy-groups:
+  - name: 🎵 网易云音乐
+    type: select
+    use:
+      - NeteaseMusic
+    proxies:
+      - DIRECT
+  - name: ‼️ 免费代理，如遇收费请举报
+    type: select
+    proxies:
+      - DIRECT
+
+rule-providers:
+  NeteaseMusic:
+    type: http
+    behavior: classical
+    path: ./RuleSet/NeteaseMusic.yaml
+    url: https://cdn.staticaly.com/gh/DesperadoJ/Rules-for-UnblockNeteaseMusic/master/Clash/RuleSet/NeteaseMusic.yaml
+    interval: 86400
+
+rules:
+  # Netease Music Advertising
+  - DOMAIN,admusicpic.music.126.net,REJECT
+  - DOMAIN,iadmat.nosdn.127.net,REJECT
+  - DOMAIN,iadmusicmat.music.126.net,REJECT
+  - DOMAIN,iadmusicmatvideo.music.126.net,REJECT
+
+  # Netease Music
+  - RULE-SET,NeteaseMusic,🎵 网易云音乐
+
+  # Final
+  - MATCH,DIRECT
